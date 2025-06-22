@@ -68,6 +68,7 @@ section {
 .project h3 {
   font-size: 18px;
   margin-bottom: 5px;
+    margin-top: 16px;
 }
 .project-thumb {
   width: 100%;
@@ -75,11 +76,19 @@ section {
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   margin-bottom: 12px;
+   transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.project-thumb:hover {
+  transform: scale(1.02); 
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); 
 }
 
 .project p {
   font-size: 14px;
   margin-bottom: 10px;
+}
+.project img {
+  margin-top: 10px;
 }
 
 /* ==== Buttons ==== */
@@ -91,11 +100,12 @@ button {
   font-weight: 500;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-  background-color: #1d4ed8;
+   background-color: #1e40af; 
+  transform: translateY(-2px); 
 }
 
 /* ==== Footer ==== */
