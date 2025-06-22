@@ -15,39 +15,94 @@ function drawBoard() {
 }
 
 function makeMove(index) {
-  if (gameBoard[index] || checkWinner()) return;
+  if (gameBoard[index] || checkWinner() || gameBoard.every(Boolean)) return;
   gameBoard[index] = currentPlayer;
   drawBoard();
 
   if (checkWinner()) {
     status.textContent = `🎉 Player ${currentPlayer} wins!`;
-  } else if (gameBoard.every(Boolean)) {
-    status.textContent = "It's a draw!";
-  } else {
-    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-    status.textContent = `Player ${currentPlayer}'s turn`;
+    return;
+  }
 
-    if (currentPlayer === 'O') {
-      setTimeout(botMove, 500); // Bot waits 0.5 sec
-    }
+  if (gameBoard.every(Boolean)) {
+    status.textContent = "It's a draw!";
+    return;
+  }
+
+  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  status.textContent = `Player ${currentPlayer}'s turn`;
+
+  if (currentPlayer === 'O') {
+    setTimeout(bestBotMove, 400);
   }
 }
 
-function botMove() {
-  const emptyCells = gameBoard.map((v, i) => (v === null ? i : null)).filter(i => i !== null);
-  const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-  makeMove(randomIndex);
+function bestBotMove() {
+  let bestScore = -Infinity;
+  let move;
+  for (let i = 0; i < gameBoard.length; i++) {
+    if (!gameBoard[i]) {
+      gameBoard[i] = 'O';
+      let score = minimax(gameBoard, 0, false);
+      gameBoard[i] = null;
+      if (score > bestScore) {
+        bestScore = score;
+        move = i;
+      }
+    }
+  }
+  makeMove(move);
+}
+
+function minimax(boardState, depth, isMaximizing) {
+  const winner = getWinner();
+  if (winner === 'O') return 10 - depth;
+  if (winner === 'X') return depth - 10;
+  if (boardState.every(Boolean)) return 0;
+
+  if (isMaximizing) {
+    let maxEval = -Infinity;
+    for (let i = 0; i < boardState.length; i++) {
+      if (!boardState[i]) {
+        boardState[i] = 'O';
+        let eval = minimax(boardState, depth + 1, false);
+        boardState[i] = null;
+        maxEval = Math.max(maxEval, eval);
+      }
+    }
+    return maxEval;
+  } else {
+    let minEval = Infinity;
+    for (let i = 0; i < boardState.length; i++) {
+      if (!boardState[i]) {
+        boardState[i] = 'X';
+        let eval = minimax(boardState, depth + 1, true);
+        boardState[i] = null;
+        minEval = Math.min(minEval, eval);
+      }
+    }
+    return minEval;
+  }
+}
+
+function getWinner() {
+  const winPatterns = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  for (let pattern of winPatterns) {
+    const [a, b, c] = pattern;
+    if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+      return gameBoard[a];
+    }
+  }
+  return null;
 }
 
 function checkWinner() {
-  const winPatterns = [
-    [0,1,2], [3,4,5], [6,7,8],
-    [0,3,6], [1,4,7], [2,5,8],
-    [0,4,8], [2,4,6],
-  ];
-  return winPatterns.some(pattern =>
-    pattern.every(i => gameBoard[i] === currentPlayer)
-  );
+  const winner = getWinner();
+  return winner !== null;
 }
 
 function resetGame() {
