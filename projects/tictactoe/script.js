@@ -18,6 +18,7 @@ function makeMove(index) {
   if (gameBoard[index] || checkWinner()) return;
   gameBoard[index] = currentPlayer;
   drawBoard();
+
   if (checkWinner()) {
     status.textContent = `🎉 Player ${currentPlayer} wins!`;
   } else if (gameBoard.every(Boolean)) {
@@ -25,7 +26,17 @@ function makeMove(index) {
   } else {
     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
     status.textContent = `Player ${currentPlayer}'s turn`;
+
+    if (currentPlayer === 'O') {
+      setTimeout(botMove, 500); // Bot waits 0.5 sec
+    }
   }
+}
+
+function botMove() {
+  const emptyCells = gameBoard.map((v, i) => (v === null ? i : null)).filter(i => i !== null);
+  const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  makeMove(randomIndex);
 }
 
 function checkWinner() {
