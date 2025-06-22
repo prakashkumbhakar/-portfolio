@@ -16,16 +16,25 @@ function drawBoard() {
 
 function makeMove(index) {
   if (gameBoard[index] || checkWinner() || gameBoard.every(Boolean)) return;
+
   gameBoard[index] = currentPlayer;
   drawBoard();
 
   if (checkWinner()) {
-    status.textContent = `🎉 Player ${currentPlayer} wins!`;
+    if (currentPlayer === 'X') {
+      status.textContent = "✅ You WIN! 🎉";
+      status.className = "status win-player";
+    } else {
+      status.textContent = "❌ You LOSE! 🤖 Bot wins!";
+      status.className = "status win-bot";
+      document.querySelector('.container').classList.add('shake');
+    }
     return;
   }
 
   if (gameBoard.every(Boolean)) {
-    status.textContent = "It's a draw!";
+    status.textContent = "🤝 It's a Draw!";
+    status.className = "status draw";
     return;
   }
 
@@ -36,6 +45,7 @@ function makeMove(index) {
     setTimeout(bestBotMove, 400);
   }
 }
+
 
 function bestBotMove() {
   let bestScore = -Infinity;
@@ -109,7 +119,8 @@ function resetGame() {
   gameBoard = Array(9).fill(null);
   currentPlayer = 'X';
   status.textContent = `Player ${currentPlayer}'s turn`;
+  status.className = "status"; // 🔁 Reset win/draw styles
+  document.querySelector('.container').classList.remove('shake'); // 🧠 Remove bot win shake
   drawBoard();
 }
 
-drawBoard();
